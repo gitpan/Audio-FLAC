@@ -1,5 +1,17 @@
 Revision history for Perl extension Audio::FLAC.
 
+0.7   Thu Jan 29 08:44:20 PST 2004
+
+        - Added more debug info when we can't get data.
+
+        - Fixed some bugs from Jason Holtzapple.
+
+0.6   Mon Jan 26 20:10:26 PST 2004
+
+	- Added cuesheet parsing from Michael.
+
+	- Continue if there is no vorbis comment, which is valid.
+
 0.5   Mon Dec 15 08:28:12 2003
 
 	- Add ID3 skipping code, return hashrefs, writeTag code.
