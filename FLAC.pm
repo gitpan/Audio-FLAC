@@ -1,11 +1,11 @@
 package Audio::FLAC;
 
-# $Id: FLAC.pm,v 1.2 2003/12/15 16:26:15 daniel Exp $
+# $Id: FLAC.pm,v 1.3 2004/01/16 02:18:21 daniel Exp $
 
 use strict;
 use vars qw($VERSION);
 
-$VERSION = '0.5';
+$VERSION = '0.6';
 
 # First four bytes of stream are always fLaC
 use constant FLACHEADERFLAG => 'fLaC';
@@ -207,7 +207,7 @@ sub write {
 	binmode FLACFILE;
 
 	# seek to the location of the existing metadata blocks
-	seek FLACFILE, $self->{'startMetadataBlocks'}, 0;
+	seek FLACFILE, ($self->{'startMetadataBlocks'})-4, 0;
 
 	# overwrite the existing metadata blocks
 	print FLACFILE $metadataBlocks or return -1;
@@ -357,12 +357,20 @@ sub _parseStreaminfo {
 	$self->{'info'} = $info;
 
 	# Calculate the track times
-	$totalSeconds = $info->{'TOTALSAMPLES'}/$info->{'SAMPLERATE'};
+	$totalSeconds = $info->{'TOTALSAMPLES'} / $info->{'SAMPLERATE'};
+
+	if ($totalSeconds == 0) {
+		warn "totalSeconds is 0 - we couldn't find either TOTALSAMPLES or SAMPLERATE!\n" .
+		     "setting totalSeconds to 1 to avoid divide by zero error!\n";
+
+		$totalSeconds = 1;
+	}
+
 	$self->{'trackTotalLengthSeconds'} = $totalSeconds;
 
 	$self->{'trackLengthMinutes'} = int(int($totalSeconds) / 60);
 	$self->{'trackLengthSeconds'} = int($totalSeconds) % 60;
-	$self->{'trackLengthFrames'}  = ($totalSeconds - int($totalSeconds)) % 75;
+	$self->{'trackLengthFrames'}  = ($totalSeconds - int($totalSeconds)) * 75;
 	$self->{'bitRate'}            = 8 * ($self->{'fileSize'} - $self->{'startAudioData'}) / $totalSeconds;
 
 	return 0;
@@ -433,7 +441,7 @@ sub _findMetadataIndex {
 	my $self  = shift;
 	my $htype = shift;
 
-	my ($idx, $found) = 0;
+	my ($idx, $found) = (0, 0);
 
 	# Loop through the metadata_blocks until one of $htype is found
 	while ($idx < @{$self->{'metadataBlocks'}}) {

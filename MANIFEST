@@ -4,5 +4,5 @@ MANIFEST
 README
 data/test.flac
 t/Audio-FLAC.t
-lib/Audio/FLAC.pm
+FLAC.pm
 META.yml                                Module meta-data (added by MakeMaker)
