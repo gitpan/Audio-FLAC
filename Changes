@@ -1,5 +1,9 @@
 Revision history for Perl extension Audio::FLAC.
 
+0.8   Sat Jul 10 15:03:52 PDT 2004
+
+        - Add application block parsing from Michael Turner.
+
 0.7   Thu Jan 29 08:44:20 PST 2004
 
         - Added more debug info when we can't get data.
